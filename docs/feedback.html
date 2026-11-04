@@ -1,0 +1,23 @@
+<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>نظر شما</title>
+<style>*{box-sizing:border-box}body{margin:0;min-height:100vh;overflow:hidden;font-family:Tahoma,system-ui,sans-serif;color:#fff;background:linear-gradient(160deg,#2346a8,#4a7df0 52%,#f0506a);display:flex;align-items:center;justify-content:center;padding:16px}
+.c{position:relative;z-index:2;width:100%;max-width:420px;text-align:center;padding:22px;border-radius:24px;background:linear-gradient(135deg,#ffffff40,#ffffff14);border:1px solid #fff6;box-shadow:0 20px 60px #0006;backdrop-filter:blur(8px)}
+.e{display:flex;justify-content:space-around;font-size:46px;margin:16px 0}.e span{transition:transform .15s;opacity:.6}.e span.on{transform:scale(1.35);opacity:1}
+textarea,button{font:inherit;width:100%;border-radius:14px;border:1px solid #fff6;padding:12px;background:#ffffff26;color:#fff}textarea::placeholder{color:#ffffffbb}button{background:linear-gradient(135deg,#ff5d7a,#d62839);border:0;font-weight:700;margin-top:10px}
+.c a{display:inline-block;margin:5px;padding:9px 14px;border-radius:14px;background:#fff;color:#23439f;font-weight:700;text-decoration:none;font-size:13px}
+.b{position:fixed;bottom:-80px;font-size:34px;animation:up 7s linear infinite;z-index:1;opacity:.85}@keyframes up{to{transform:translateY(-120vh) rotate(12deg)}}
+.p{position:fixed;font-size:24px;animation:z 1.8s ease-out forwards;z-index:9;pointer-events:none;left:50%;top:45%}@keyframes z{to{transform:translate(var(--x),var(--y)) rotate(540deg);opacity:0}}</style></head><body>
+<div class="c" id="c"><h2>🎂 نظر شما برای ما ارزشمند است</h2><div class="e" id="e"><span data-v="good">😍</span><span data-v="ok">😐</span><span data-v="bad">😞</span></div>
+<textarea id="m" rows="3" maxlength="500" placeholder="اگر مایلید توضیح بدهید (اختیاری)"></textarea><button id="b">ثبت نظر</button></div>
+<script>
+// بعد از ساخت اسکریپت گوگل، آدرس Web app را اینجا بگذارید. آیدی‌ها را هم عوض کنید.
+const SCRIPT="https://script.google.com/macros/s/AKfycbyYAWvMV4q5dzajdVmYYLs2zYPKixjhrg8pJjUk3W9sjZonppFNEZf_7q5FkfcjraTD/exec",TG="https://t.me/mazze_baz",RUBIKA="rubika.ir/mazze_baz",EITAA="eitaa.com/mazze_baz";
+const biz=new URLSearchParams(location.search).get('b')||'';let v='';
+['🎈','🎉','🎈','🎊','🎈'].forEach((t,i)=>{const b=document.createElement('i');b.className='b';b.textContent=t;b.style.cssText=`left:${10+i*20}%;animation-delay:${i*1.4}s`;document.body.appendChild(b)});
+function boom(){for(let i=0;i<70;i++){const p=document.createElement('i');p.className='p';p.textContent=['🎉','🎈','✨','🎂'][i%4];p.style.cssText=`--x:${(Math.random()-.5)*110}vw;--y:${(Math.random()-.8)*70}vh`;document.body.appendChild(p);setTimeout(()=>p.remove(),1900)}}
+document.querySelectorAll('#e span').forEach(s=>s.onclick=()=>{v=s.dataset.v;document.querySelectorAll('#e span').forEach(x=>x.classList.toggle('on',x==s))});
+document.getElementById('b').onclick=async()=>{if(!v)return alert('لطفاً یک گزینه را انتخاب کنید');
+const d=new URLSearchParams({biz,rate:v,text:document.getElementById('m').value});
+try{await fetch(SCRIPT,{method:'POST',mode:'no-cors',body:d})}catch(e){}
+if(v=='good'){boom();navigator.vibrate&&navigator.vibrate([200,100,200])}
+document.getElementById('c').innerHTML='<h2>'+(v=='good'?'🎉 از نظرات شما سپاس‌گذاریم':'🙏 سعی می‌کنیم بهتر شویم')+'</h2><p>نظر شما ثبت شد.</p><p style="font-size:13px">انتقادات و پیشنهادات خود را با آیدی زیر هم می‌توانید بگویید:</p><a href="https://t.me/'+TG+'">Telegram</a><a href="https://rubika.ir/'+RUBIKA+'">Rubika</a><a href="https://eitaa.com/'+EITAA+'">Eitaa</a>'};
+</script></body></html>
