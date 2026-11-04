@@ -10,7 +10,7 @@ textarea,button{font:inherit;width:100%;border-radius:14px;border:1px solid #fff
 <textarea id="m" rows="3" maxlength="500" placeholder="اگر مایلید توضیح بدهید (اختیاری)"></textarea><button id="b">ثبت نظر</button></div>
 <script>
 // بعد از ساخت اسکریپت گوگل، آدرس Web app را اینجا بگذارید. آیدی‌ها را هم عوض کنید.
-const SCRIPT="https://script.google.com/macros/s/AKfycbyYAWvMV4q5dzajdVmYYLs2zYPKixjhrg8pJjUk3W9sjZonppFNEZf_7q5FkfcjraTD/exec",TG="https://t.me/mazze_baz",RUBIKA="rubika.ir/mazze_baz",EITAA="eitaa.com/mazze_baz";
+const SCRIPT="https://script.google.com/macros/s/AKfycbxJK-s7HTYBPhXbKe1P7WjTDZdlATvJLp_E1LtNTq69NsiOh76jYlxHA-KvtpCvcI13/exec",TG="mazze_baz",RUBIKA="mazze_baz",EITAA="mazze_baz";
 const biz=new URLSearchParams(location.search).get('b')||'';let v='';
 ['🎈','🎉','🎈','🎊','🎈'].forEach((t,i)=>{const b=document.createElement('i');b.className='b';b.textContent=t;b.style.cssText=`left:${10+i*20}%;animation-delay:${i*1.4}s`;document.body.appendChild(b)});
 function boom(){for(let i=0;i<70;i++){const p=document.createElement('i');p.className='p';p.textContent=['🎉','🎈','✨','🎂'][i%4];p.style.cssText=`--x:${(Math.random()-.5)*110}vw;--y:${(Math.random()-.8)*70}vh`;document.body.appendChild(p);setTimeout(()=>p.remove(),1900)}}
