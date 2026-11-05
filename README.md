@@ -1,2 +1,1 @@
-# مزه باز (نسخهٔ ساده)
-www/config.js: YOUR_USER و CONTACT را عوض کن. status.json: enabled=false خاموش، revoked ابطال کلید.
+# مزه باز v4: @mazze_baz، CONTACT، SCRIPT، FB_KEY، FEEDBACK  www/config.js

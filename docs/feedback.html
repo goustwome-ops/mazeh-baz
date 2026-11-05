@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07101f">
+<title>نظر شما | مزه‌باز</title>
+<style>
+:root{
+  --bg1:#050b18;--bg2:#0a2a55;--purple:#0a84ff;--electric:#19d3ff;
+  --pink:#dc143c;--green:#2ee59d;--yellow:#ffd23f;--red:#ff3b4e;
+  --muted:#c9c8e8;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;overflow-x:hidden;overflow-y:auto;
+  font-family:Tahoma,system-ui,sans-serif;color:#fff;
+  background:
+    radial-gradient(circle at 12% 15%,#19d3ff44,transparent 34%),
+    radial-gradient(circle at 90% 80%,#dc143c55,transparent 36%),
+    linear-gradient(145deg,#050b18,#0a1f45 52%,#3a0a1c);
+  display:flex;align-items:center;justify-content:center;padding:22px 14px;
+}
+body:before,body:after{
+  content:"";position:fixed;width:260px;height:260px;border-radius:50%;
+  filter:blur(70px);opacity:.25;pointer-events:none;z-index:0;
+}
+body:before{background:var(--electric);top:-100px;left:-90px}
+body:after{background:var(--pink);bottom:-120px;right:-90px}
+.card{
+  position:relative;z-index:2;width:100%;max-width:470px;padding:25px 22px;
+  border-radius:28px;text-align:center;
+  background:linear-gradient(145deg,#ffffff20,#ffffff0b);
+  border:1px solid #19d3ff55;box-shadow:0 24px 75px #000a,0 0 40px #19d3ff22,inset 0 0 30px #dc143c14;
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+.sparkline{font-size:13px;color:#7fe3ff;letter-spacing:1px}
+h1{font-size:23px;margin:9px 0 7px}
+.subtitle{font-size:13px;line-height:1.9;color:var(--muted);margin:0 0 17px}
+.faces{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0 20px}
+.face{cursor:pointer;border:1px solid #ffffff2a;border-radius:20px;padding:12px 4px;background:#ffffff0a;color:#fff;transition:.2s;min-width:0}
+.face .emoji{display:flex;align-items:center;justify-content:center;width:64px;height:64px;margin:0 auto;border-radius:50%;font-size:34px;background:radial-gradient(circle at 30% 25%,#ffffffcc 0,#ffffff55 12%,transparent 30%),radial-gradient(circle at 50% 60%,var(--a),var(--b) 70%);border:1px solid #ffffff77;box-shadow:inset 0 -8px 14px var(--d),inset 0 6px 10px #ffffff55,0 6px 18px var(--e);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:.2s}
+.face .label{display:block;font-size:13px;font-weight:bold;margin-top:8px;color:var(--c)}
+.face.selected{background:var(--b);border-color:var(--c);box-shadow:0 0 24px var(--e)}.face.selected .emoji{transform:scale(1.15)}
+.face[data-v="bad"] .emoji{animation:warn 1.6s ease-in-out infinite}
+@keyframes warn{50%{box-shadow:inset 0 -8px 14px #ff3b4e66,inset 0 6px 10px #ffffff55,0 0 30px #ff3b4ecc}}
+.face[data-v="good"]{--c:#2ee59d;--a:#2ee59d88;--b:#2ee59d22;--d:#2ee59d66;--e:#2ee59d55}
+.face[data-v="ok"]{--c:#ffd23f;--a:#ffd23f88;--b:#ffd23f22;--d:#ffd23f66;--e:#ffd23f55}
+.face[data-v="bad"]{--c:#ff3b4e;--a:#ff3b4e88;--b:#ff3b4e22;--d:#ff3b4e66;--e:#ff3b4e55}
+.section{display:none;text-align:right;margin:8px 0 17px;animation:appear .25s ease}
+.section.show{display:block}
+.section-title{font-size:14px;font-weight:bold;margin:0 0 11px;color:#fff}
+.hint{font-size:11px;color:#c9c8e8;font-weight:normal}
+.options{display:flex;flex-wrap:wrap;gap:8px}
+.option{
+  border:1px solid #ffffff42;background:#ffffff12;color:#fff;
+  border-radius:999px;padding:9px 12px;font:inherit;font-size:12px;
+  cursor:pointer;transition:.18s;
+}
+.option:after{content:"＋";margin-right:6px;opacity:.7}
+.option.active{background:#19d3ff33;border-color:var(--electric);box-shadow:0 0 14px #19d3ff55}
+.option.active:after{content:"✓";color:#fff;opacity:1}
+textarea{
+  display:block;width:100%;resize:vertical;min-height:88px;max-height:180px;
+  border:1px solid #ffffff40;border-radius:16px;padding:13px;
+  background:#050b1899;color:#fff;font:inherit;font-size:13px;line-height:1.8;outline:none;
+}
+textarea:focus{border-color:var(--electric);box-shadow:0 0 0 3px #35d7ff20}
+textarea::placeholder{color:#c5c7df}
+.send{
+  width:100%;border:0;border-radius:16px;padding:14px;margin-top:13px;
+  color:#fff;font:inherit;font-weight:bold;font-size:15px;cursor:pointer;
+  background:linear-gradient(100deg,#0a84ff,#19d3ff 42%,#dc143c);
+  box-shadow:0 9px 25px #0a84ff55;transition:.2s;
+}
+.send:active{transform:scale(.98)}
+.send:disabled{opacity:.6;cursor:wait}
+.foot{font-size:11px;color:#bfc3e6;margin:15px 0 0}
+.links{margin-top:12px}
+.links a{display:inline-block;margin:4px;padding:8px 12px;border-radius:12px;
+  background:#ffffffeb;color:#0a2a55;text-decoration:none;font-size:12px;font-weight:bold}
+.hidden{display:none!important}
+.float{
+  position:fixed;bottom:-60px;z-index:1;pointer-events:none;opacity:.55;
+  font-size:27px;animation:floatUp 9s linear infinite;
+}
+@keyframes floatUp{to{transform:translateY(-115vh) rotate(240deg);opacity:0}}
+.burst{
+  position:fixed;z-index:10;left:50%;top:46%;pointer-events:none;
+  font-size:23px;animation:burst 1.5s ease-out forwards;
+}
+@keyframes burst{
+  to{transform:translate(var(--x),var(--y)) rotate(520deg) scale(.5);opacity:0}
+}
+.success-icon{font-size:54px;margin:5px}
+.success-title{font-size:22px;margin:8px 0}
+.success-text{color:#d6d5f2;font-size:13px;line-height:2}
+@keyframes appear{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@media(max-width:360px){.card{padding:20px 15px}.face .emoji{font-size:34px}}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="sparkline">⚡ MAZEH BAZ · YOUR VOICE MATTERS ⚡</div>
+  <h1>تجربه‌ات چطور بود؟ ⚡</h1>
+  <p class="subtitle">با انتخاب یکی از حالت‌ها، کمک کن بهتر بشیم.</p>
+
+  <div class="faces" id="faces" role="group" aria-label="امتیاز شما">
+    <button type="button" class="face" data-v="good" aria-pressed="false">
+      <span class="emoji">😄</span><span class="label">عالی بود</span>
+    </button>
+    <button type="button" class="face" data-v="ok" aria-pressed="false">
+      <span class="emoji">😐</span><span class="label">معمولی بود</span>
+    </button>
+    <button type="button" class="face" data-v="bad" aria-pressed="false">
+      <span class="emoji">😞</span><span class="label">راضی نبودم</span>
+    </button>
+  </div>
+
+  <div class="section" id="suggestions">
+    <p class="section-title" id="suggestionTitle">کدوم مورد رو تجربه کردی؟ <span class="hint">(می‌تونی چندتا انتخاب کنی)</span></p>
+    <div class="options" id="options"></div>
+  </div>
+
+  <div style="text-align:right">
+    <p class="section-title">اگر مایلید نظر خود را بیان کنید <span class="hint">(اختیاری)</span></p>
+    <textarea id="message" rows="3" maxlength="500" placeholder="اینجا برامون بنویس..."></textarea>
+  </div>
+
+  <button type="button" class="send" id="send">ثبت نظر ✨</button>
+  <p class="foot">نظرت محرمانه نیست؟ فقط برای بهتر کردن تجربه خرید بررسی می‌شه 💙</p>
+</div>
+
+<script>
+// آدرس Web App و شناسه شبکه‌های اجتماعی خودت را جایگزین کن.
+const SCRIPT = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+const TG = "YOUR_TELEGRAM_ID";
+const RUBIKA = "YOUR_RUBIKA_ID";
+const EITAA = "YOUR_EITAA_ID";
+
+const biz = new URLSearchParams(location.search).get("b") || "";
+let rating = "";
+const selected = new Set();
+
+const choices = {
+  good: ["کیفیت بالا", "حجم زیاد", "طعم عالی", "غذای گرم و تازه", "بسته‌بندی خوب", "قیمت مناسب", "برخورد عالی"],
+  bad: ["کیفیت پایین", "غذای سرد", "حجم کم", "طعم نامناسب", "بسته‌بندی نامناسب", "قیمت بالا", "تأخیر در آماده‌سازی"],
+  ok: ["کیفیت بالا", "حجم زیاد", "طعم عالی", "غذای گرم و تازه", "بسته‌بندی خوب", "قیمت مناسب", "کیفیت پایین", "غذای سرد", "حجم کم", "طعم نامناسب", "قیمت بالا"]
+};
+
+["⚡","✨","🔹","💫","⚡"].forEach((symbol, i) => {
+  const item = document.createElement("span");
+  item.className = "float";
+  item.textContent = symbol;
+  item.style.left = (8 + i * 20) + "%";
+  item.style.animationDelay = (i * 1.3) + "s";
+  document.body.appendChild(item);
+});
+
+function renderOptions() {
+  const area = document.getElementById("options");
+  area.replaceChildren();
+  selected.clear();
+
+  choices[rating].forEach(label => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "option";
+    button.textContent = label;
+    button.setAttribute("aria-pressed", "false");
+    button.addEventListener("click", () => {
+      if (selected.has(label)) {
+        selected.delete(label);
+        button.classList.remove("active");
+        button.setAttribute("aria-pressed", "false");
+      } else {
+        selected.add(label);
+        button.classList.add("active");
+        button.setAttribute("aria-pressed", "true");
+      }
+    });
+    area.appendChild(button);
+  });
+
+  document.getElementById("suggestions").classList.add("show");
+  document.getElementById("suggestionTitle").firstChild.textContent =
+    rating === "good" ? "چی برات جذاب بود؟ " :
+    rating === "bad" ? "چه چیزی نیاز به بهتر شدن داره؟ " :
+    "کدوم مورد رو تجربه کردی؟ ";
+}
+
+document.querySelectorAll(".face").forEach(button => {
+  button.addEventListener("click", () => {
+    rating = button.dataset.v;
+    document.querySelectorAll(".face").forEach(face => {
+      const active = face === button;
+      face.classList.toggle("selected", active);
+      face.setAttribute("aria-pressed", String(active));
+    });
+    renderOptions();
+  });
+});
+
+function celebrate() {
+  const symbols = rating === "good"
+    ? ["🎉","💚","✨","🎊","💖","⚡"]
+    : rating === "ok"
+    ? ["✨","💛","🎈","⭐","💫"]
+    : ["💗","✨","🫶","🌸"];
+  const amount = rating === "good" ? 65 : rating === "ok" ? 42 : 30;
+
+  for (let i = 0; i < amount; i++) {
+    const particle = document.createElement("i");
+    particle.className = "burst";
+    particle.textContent = symbols[i % symbols.length];
+    particle.style.setProperty("--x", ((Math.random() - .5) * 100) + "vw");
+    particle.style.setProperty("--y", ((Math.random() - .55) * 75) + "vh");
+    document.body.appendChild(particle);
+    setTimeout(() => particle.remove(), 1600);
+  }
+
+  if (navigator.vibrate) {
+    navigator.vibrate(rating === "good" ? [120,60,180] : [80,50,80]);
+  }
+}
+
+document.getElementById("send").addEventListener("click", async () => {
+  if (!rating) {
+    alert("اول یکی از سه حالت رو انتخاب کن 😊");
+    return;
+  }
+  if (!SCRIPT || SCRIPT.includes("YOUR_SCRIPT_ID")) {
+    alert("آدرس Web App هنوز در کد تنظیم نشده است. مقدار SCRIPT را با آدرس واقعی جایگزین کن.");
+    return;
+  }
+
+  const sendButton = document.getElementById("send");
+  sendButton.disabled = true;
+  sendButton.textContent = "در حال ارسال...";
+
+  const data = new URLSearchParams({
+    biz: biz,
+    rate: rating,
+    text: document.getElementById("message").value.trim(),
+    tags: Array.from(selected).join("، ")
+  });
+
+  try {
+    // Apps Script با no-cors پاسخ قابل‌خواندن برنمی‌گرداند؛ این همان روش ارسال سازگار با نسخه قبلی است.
+    await fetch(SCRIPT, { method: "POST", mode: "no-cors", body: data });
+    celebrate();
+
+    const card = document.getElementById("card");
+    const title = rating === "good" ? "چه انرژی خوبی! 🎉" :
+                  rating === "ok" ? "ممنون از بازخوردت! 💛" :
+                  "ممنون که صادقانه گفتی 💗";
+
+    card.innerHTML = `
+      <div class="success-icon">${rating === "good" ? "💚" : rating === "ok" ? "✨" : "🫶"}</div>
+      <h2 class="success-title">${title}</h2>
+      <p class="success-text">از وقتی که گذاشتی ممنونیم.<br>نظرت به ما کمک می‌کنه بهتر بشیم.</p>
+      <div class="links" id="socialLinks"></div>
+    `;
+
+    const links = document.getElementById("socialLinks");
+    [
+      ["Telegram", "https://t.me/", TG],
+      ["Rubika", "https://rubika.ir/", RUBIKA],
+      ["Eitaa", "https://eitaa.com/", EITAA]
+    ].forEach(([label, base, id]) => {
+      if (id && !id.startsWith("YOUR_")) {
+        const a = document.createElement("a");
+        a.href = base + encodeURIComponent(id);
+        a.textContent = label;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        links.appendChild(a);
+      }
+    });
+  } catch (error) {
+    sendButton.disabled = false;
+    sendButton.textContent = "ارسال دوباره";
+    alert("ارسال انجام نشد. اتصال اینترنت را بررسی کن و دوباره تلاش کن.");
+  }
+});
+</script>
+</body>
+</html>
