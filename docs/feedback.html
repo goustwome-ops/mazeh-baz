@@ -100,6 +100,7 @@ textarea::placeholder{color:#c5c7df}
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
 }
+.exit{width:100%;margin-top:18px;padding:16px;border:0;border-radius:16px;font:inherit;font-size:18px;font-weight:bold;color:#fff;background:linear-gradient(100deg,#dc143c,#ff3b4e);box-shadow:0 0 24px #dc143c88;cursor:pointer}
 </style>
 </head>
 <body>
@@ -136,7 +137,7 @@ textarea::placeholder{color:#c5c7df}
 
 <script>
 // آدرس Web App و شناسه شبکه‌های اجتماعی خودت را جایگزین کن.
-const SCRIPT = "https://script.google.com/macros/s/AKfycbxJK-s7HTYBPhXbKe1P7WjTDZdlATvJLp_E1LtNTq69NsiOh76jYlxHA-KvtpCvcI13/exec";
+const SCRIPT = "https://script.google.com/macros/s/AKfycbw0aWNT8LrSkg9erJVtH_GdUlon2IZ2dEvd94ZM2eRsuRQMjBaCGT5IvsNOJg5urbgt/exec";
 const TG = "t.me/mazze_baz?direct";
 const RUBIKA = "rubika.ir/mazze_baz";
 const EITAA = "eitaa.com/mazze_baz";
@@ -227,6 +228,42 @@ function celebrate() {
   }
 }
 
+function showDone(rating, again) {
+    const card = document.getElementById("card");
+    const title = rating === "good" ? "چه انرژی خوبی! 🎉" :
+                  rating === "ok" ? "ممنون از بازخوردت! 💛" :
+                  "ممنون که صادقانه گفتی 💗";
+
+    card.innerHTML = `
+      <div class="success-icon">${rating === "good" ? "💚" : rating === "ok" ? "✨" : "🫶"}</div>
+      <h2 class="success-title">${title}</h2>
+      <p class="success-text">${again ? "نظر شما قبلاً ثبت شده است.<br>سپاس‌گزاریم." : "از وقتی که گذاشتی ممنونیم.<br>نظرت به ما کمک می‌کنه بهتر بشیم."}</p>
+      <div class="links" id="socialLinks"></div>
+    `;
+
+    const links = document.getElementById("socialLinks");
+    [
+      ["Telegram", "https://t.me/", TG],
+      ["Rubika", "https://rubika.ir/", RUBIKA],
+      ["Eitaa", "https://eitaa.com/", EITAA]
+    ].forEach(([label, base, id]) => {
+      if (id && !id.startsWith("YOUR_")) {
+        const a = document.createElement("a");
+        a.href = base + encodeURIComponent(id);
+        a.textContent = label;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        links.appendChild(a);
+      }
+    });
+
+  const ex = document.createElement("button");
+  ex.className = "exit";
+  ex.textContent = "خروج";
+  ex.onclick = () => { window.close(); setTimeout(() => location.replace("about:blank"), 250); };
+  card.appendChild(ex);
+}
+
 document.getElementById("send").addEventListener("click", async () => {
   if (!rating) {
     alert("اول یکی از سه حالت رو انتخاب کن 😊");
@@ -251,41 +288,16 @@ document.getElementById("send").addEventListener("click", async () => {
   try {
     // Apps Script با no-cors پاسخ قابل‌خواندن برنمی‌گرداند؛ این همان روش ارسال سازگار با نسخه قبلی است.
     await fetch(SCRIPT, { method: "POST", mode: "no-cors", body: data });
+    try { localStorage.setItem('fbdone_' + biz, rating); } catch (e) {}
     celebrate();
-
-    const card = document.getElementById("card");
-    const title = rating === "good" ? "چه انرژی خوبی! 🎉" :
-                  rating === "ok" ? "ممنون از بازخوردت! 💛" :
-                  "ممنون که صادقانه گفتی 💗";
-
-    card.innerHTML = `
-      <div class="success-icon">${rating === "good" ? "💚" : rating === "ok" ? "✨" : "🫶"}</div>
-      <h2 class="success-title">${title}</h2>
-      <p class="success-text">از وقتی که گذاشتی ممنونیم.<br>نظرت به ما کمک می‌کنه بهتر بشیم.</p>
-      <div class="links" id="socialLinks"></div>
-    `;
-
-    const links = document.getElementById("socialLinks");
-    [
-      ["Telegram", "https://t.me/", TG],
-      ["Rubika", "https://rubika.ir/", RUBIKA],
-      ["Eitaa", "https://eitaa.com/", EITAA]
-    ].forEach(([label, base, id]) => {
-      if (id && !id.startsWith("YOUR_")) {
-        const a = document.createElement("a");
-        a.href = base + encodeURIComponent(id);
-        a.textContent = label;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        links.appendChild(a);
-      }
-    });
+    showDone(rating, false);
   } catch (error) {
     sendButton.disabled = false;
     sendButton.textContent = "ارسال دوباره";
     alert("ارسال انجام نشد. اتصال اینترنت را بررسی کن و دوباره تلاش کن.");
   }
 });
+try { const done = localStorage.getItem('fbdone_' + biz); if (done) showDone(done, true); } catch (e) {}
 </script>
 </body>
 </html>

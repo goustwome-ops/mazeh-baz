@@ -16,7 +16,7 @@ const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';setT
 const dt=t=>new Date(t).toLocaleDateString('fa-IR-u-nu-latn'),tm=t=>new Date(t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
 const mi=ts=>{const p=new Intl.DateTimeFormat('fa-IR-u-nu-latn',{year:'numeric',month:'numeric'}).formatToParts(ts),g=t=>+p.find(x=>x.type==t).value;return g('year')*12+g('month')};
 function boom(){for(let i=0;i<90;i++){const p=document.createElement('i');p.className='p';p.textContent=['🎉','🍔','🍟','✨','🍕','🥤'][i%6];p.style.cssText=`left:50%;top:45%;--x:${(Math.random()-.5)*110}vw;--y:${(Math.random()-.8)*70}vh`;document.body.appendChild(p);setTimeout(()=>p.remove(),1800)}}
-async function remote(){try{const r=await fetch(C.STATUS_URL+'?t='+Date.now(),{cache:'no-store'});st=await r.json();off=st.enabled===false?(st.message||'برنامه موقتاً غیرفعال شده است'):null;if(S.lic&&(st.revoked||[]).includes(S.lic.key))off='این اشتراک باطل شده است'}catch(e){}draw()}
+async function remote(){try{const r=await fetch(C.STATUS_URL+'?t='+Date.now(),{cache:'no-store'});st=await r.json();off=st.enabled===false?(st.message||'برنامه موقتاً غیرفعال شده است'):null;if(S.lic&&(st.revoked||[]).includes(S.lic.key))off='این اشتراک باطل شده است'}catch(e){}await chkLic();draw()}
 setInterval(remote,C.CHECK_MIN*6e4);remote();
 const tabs=()=>[['order','🍔','سفارش'],['hist','🧾','تاریخچه'],['tabs','🪑','میزها'],['stat','📊','آمار'],['set','⚙️','تنظیمات'],...(king?[['prof','💰','سود']]:[])];
 let sx,sy;document.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
@@ -34,9 +34,16 @@ function agree(){if(!$('#ck').checked||!$('#sg').value.trim())return toast('نا
 const bizV=()=>`<div class="center"><h1>عنوان کسب‌وکار</h1><input id="bn" placeholder="مثلاً: مجموعه جردن"><div class="chips" style="justify-content:center;flex-wrap:wrap">${TYPES.map(t=>`<b class="${t==bt?'on':''}" onclick="bt='${t}';document.querySelectorAll('.chips b').forEach(x=>x.classList.toggle('on',x.textContent==bt))">${t}</b>`).join('')}</div><button class="go" onclick="setBiz()">ادامه</button></div>`;
 function setBiz(){const n=$('#bn').value.trim();if(!n)return toast('عنوان را وارد کنید');S.biz={name:n,type:bt};S.rateAt=Date.now();S.promoAt=Date.now()+2.5*DAY;save();draw()}
 const licV=h=>`<div class="${h?'center':''}"><h1>${h}</h1><input id="k" dir="ltr" placeholder="MBM-XXXXXXXX-XX"><button class="go" onclick="act()">فعال‌سازی کلید</button></div>`;
-function act(){const k=$('#k').value.trim().toUpperCase(),m=k.match(/^MB([DMHY])-([A-Z2-9]{8})-([A-Z2-9]{2})$/);
- if(!m||chk(k.slice(0,-3))!=m[3])return toast('کلید نامعتبر است');if((st.revoked||[]).includes(k))return toast('این کلید باطل شده');if((S.used||[]).includes(k))return toast('این کلید قبلاً استفاده شده');
- S.used.push(k);S.lic={key:k,start:Date.now(),days:LD[m[1]]};save();first=1;toast('🎂 تبریک! مزه باز فعال شد');draw()}
+async function devId(){try{const d=await Capacitor.Plugins.Device.getId();if(d&&d.identifier)return d.identifier}catch(e){}return localStorage.dv||(localStorage.dv=uid()+uid())}
+async function act(){const k=$('#k').value.trim().toUpperCase(),m=k.match(/^MB([DMHY])-([A-Z2-9]{8})-([A-Z2-9]{2})$/);
+ if(!m||chk(k.slice(0,-3))!=m[3])return toast('کلید نامعتبر است');
+ if(!C.SCRIPT||C.SCRIPT.includes('YOUR_'))return toast('آدرس سرور در config.js تنظیم نشده است');
+ toast('در حال بررسی کلید…');const d=await devId();
+ try{const r=await fetch(C.SCRIPT+'?a=act&lk='+encodeURIComponent(k)+'&d='+encodeURIComponent(d),{cache:'no-store'}),j=await r.json();
+  if(!j.ok)return toast({used:'این کلید قبلاً روی دستگاه دیگری فعال شده',revoked:'این کلید باطل شده است',nokey:'کلید نامعتبر است'}[j.err]||'این کلید قابل استفاده نیست');
+  S.lic={key:k,start:j.start,days:j.days,dev:d};save();first=1;toast('🎂 تبریک! مزه باز فعال شد');draw()}
+ catch(e){toast('برای فعال‌سازی به اینترنت نیاز است')}}
+async function chkLic(){if(!S.lic||!S.lic.dev||!C.SCRIPT||C.SCRIPT.includes('YOUR_'))return;try{const r=await fetch(C.SCRIPT+'?a=chk&lk='+encodeURIComponent(S.lic.key)+'&d='+encodeURIComponent(S.lic.dev),{cache:'no-store'}),j=await r.json();if(j.ok){S.lic.start=j.start;S.lic.days=j.days;save()}else if(j.err=='revoked')off='این اشتراک باطل شده است';else if(j.err=='used')off='این اشتراک روی دستگاه دیگری فعال شده است'}catch(e){}}
 const lockV=()=>`<div class="g box center" style="padding-top:20px"><h1>🔒</h1><p>اشتراک شما تمام شده است. می‌توانید اشتراک تهیه کنید.</p><h3 dir="ltr">${C.CONTACT}</h3><p class="m">بخش آمار و دانلود گزارش‌ها همچنان فعال است.</p></div>${licV('')}`;
 function modalV(){if(modal=='rate')return `<div class="ovl"><div class="lux"><h2>آیا از برنامه ما راضی هستید؟</h2><div style="font-size:34px;letter-spacing:6px">${[1,2,3,4,5].map(n=>`<span onclick="rate(${n})">⭐</span>`).join('')}</div></div></div>`;
  if(modal=='promo')return `<div class="ovl"><div class="lux"><b class="x" style="font-size:22px" onclick="modal=null;draw()">×</b><img src="${C.PROMO_IMG}" onerror="this.remove()"><p>می‌توانید انتقادات و پیشنهادات خود را با آیدی زیر در میان بگذارید:</p><a href="https://t.me/${C.TG}" target="_blank"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="#229ED9" d="M21 3 2.5 10.3c-.8.3-.8 1.3 0 1.6l4.5 1.6 1.7 5.3c.2.6.9.8 1.4.4l2.5-2.1 4.4 3.2c.5.4 1.3.1 1.4-.5L22 4.3C22.2 3.5 21.7 2.8 21 3Z"/></svg>Telegram: ${esc(C.TG)}</a><a href="https://rubika.ir/${C.RUBIKA}" target="_blank"><svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#e8315b"/><path fill="#fff" d="M8 6h5a3.5 3.5 0 0 1 1 6.8L16.5 18H14l-2-4.9H10V18H8Z"/></svg>Rubika: ${esc(C.RUBIKA)}</a><a href="https://eitaa.com/${C.EITAA}" target="_blank"><svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#f57c00"/><path fill="#fff" d="M7 7h10v2H9v2h7v2H9v2h8v2H7Z"/></svg>Eitaa: ${esc(C.EITAA)}</a></div></div>`;return ''}
@@ -140,13 +147,13 @@ function fbDraw(){const R=fbRows,cl=x=>{x=String(x[2]);return x.includes('عال
  g=R.filter(x=>cl(x)=='g').length,o=R.filter(x=>cl(x)=='o').length,b=R.filter(x=>cl(x)=='b').length,t=g+o+b,p=n=>t?Math.round(n/t*100):0,sat=t?Math.round((g+o/2)/t*100):0,top=Math.max(g,o,b),
  v=!t?'':top==g?'بیشتر مشتری‌ها راضی بودند 😍':top==b?'بیشتر نظرها ناراضی است 😞':'بیشتر نظرها معمولی است 😐',
  bar=(l,n,c)=>`<div class="r"><span style="min-width:78px">${l}</span><div style="flex:1;height:12px;border-radius:6px;background:#00000014;overflow:hidden"><div style="width:${p(n)}%;height:100%;background:${c}"></div></div><b>${p(n)}٪ (${n})</b></div>`,
- L=R.filter(x=>fbF=='bad'?cl(x)=='b':true).slice(0,50);
+ L=R.filter(x=>fbF=='bad'?cl(x)=='b':true).slice(0,50),NEG=['کیفیت پایین','غذای سرد','حجم کم','طعم نامناسب','بسته‌بندی نامناسب','قیمت بالا','تأخیر در آماده‌سازی'],tc=(()=>{const m={};R.forEach(x=>String(x[4]||'').split('،').map(t=>t.trim()).filter(Boolean).forEach(t=>m[t]=(m[t]||0)+1));return Object.entries(m).sort((p,q)=>q[1]-p[1]).slice(0,10)})();
  ov=`<div class="ovl"><div class="sheet"><h2>💬 نظرات مشتریان</h2><div class="kpi"><div><small>درصد رضایت</small><b>${sat}٪</b></div><div><small>کل نظرها</small><b>${t}</b></div></div><p><b>${v}</b></p>
 <div style="display:flex;height:18px;border-radius:9px;overflow:hidden;margin:8px 0"><div style="width:${p(g)}%;background:#2ecc71"></div><div style="width:${p(o)}%;background:#f1c40f"></div><div style="width:${p(b)}%;background:#e74c3c"></div></div>
-${bar('😍 عالی',g,'#2ecc71')}${bar('😐 معمولی',o,'#f1c40f')}${bar('😞 ناراضی',b,'#e74c3c')}
+${bar('😍 عالی',g,'#2ecc71')}${bar('😐 معمولی',o,'#f1c40f')}${bar('😞 ناراضی',b,'#e74c3c')}${tc.length?`<p style="margin:8px 0 2px"><b>🏷 بیشترین موارد انتخابی</b></p><div style="display:flex;flex-wrap:wrap;gap:6px">${tc.map(([t,n])=>`<span style="padding:4px 10px;border-radius:12px;background:${NEG.includes(t)?'#ffd0d6':'#c8f7d4'};color:#222;font-size:12px">${esc(t)} ×${n}</span>`).join('')}</div>`:''}
 <p style="font-size:11px;opacity:.7">درصد رضایت = عالی + نصف معمولی</p>
 <div class="r3" style="margin:10px 0"><button onclick="fbF='all';fbDraw()" ${fbF=='all'?'style="outline:2px solid #b3243a"':''}>همه</button><button onclick="fbF='bad';fbDraw()" ${fbF=='bad'?'style="outline:2px solid #b3243a"':''}>فقط ناراضی‌ها</button><button onclick="ov='';draw()">بستن</button></div>
-<table>${L.map(x=>`<tr><td>${esc(x[2])}</td><td>${esc(dt(x[0]))}</td><td>${esc(x[3])||'—'}</td></tr>`).join('')||'<tr><td>نظری وجود ندارد</td></tr>'}</table></div></div>`;draw()}
+<table>${L.map(x=>`<tr><td>${esc(x[2])}</td><td>${esc(dt(x[0]))}</td><td>${esc(x[3])||(x[4]?'':'—')}${x[4]?`<br><small>🏷 ${esc(x[4])}</small>`:''}</td></tr>`).join('')||'<tr><td>نظری وجود ندارد</td></tr>'}</table></div></div>`;draw()}
 
 function showRange(){const d1=$('#d1').value,d2=$('#d2').value;if(!d1||!d2)return toast('هر دو تاریخ را انتخاب کنید');const a=new Date(d1+'T00:00:00').getTime(),b=new Date(d2+'T23:59:59').getTime();if(b<a)return toast('تاریخ پایان قبل از شروع است');curR=build('range',a,b);ov=repHTML(curR);draw()}
 function setTheme(k){S.theme=k;save();draw()}
